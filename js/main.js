@@ -48,29 +48,24 @@ function getRandomArrayElement (elements) {
   return elements[getRandomPositiveInteger(0, elements.length - 1)];
 }
 
-// Вопрос для созвона: в getRandomPositiveInteger нет проверки на уникальность, добавила ниже функцию с проверкой. Но не могу
-// понять, где в ней ошибка (при попытке отработать ее в массиве консоль выдает [Function (anonymous)]
-
-// function getRandomIdFromRangeGenerator (min, max) {
-//   const previousValues = [];
-
-//   return function () {
-//     let currentValue = getRandomPositiveInteger(min, max);
-//     if (previousValues.length >= (max - min + 1)) {
-//       console.error('Перебраны все числа из диапазона от ' + min + ' до ' + max);
-//       return null;
-//     }
-//     while (previousValues.includes(currentValue)) {
-//       currentValue = getRandomPositiveInteger(min, max);
-//     }
-//     previousValues.push(currentValue);
-//     return currentValue;
-//   };
-// }
-// console.log(getRandomIdFromRangeGenerator(1,5));
+function getRandomIdFromRangeGenerator (min, max) {
+  const previousValues = [];
+  return function () {
+    let currentValue = getRandomPositiveInteger(min, max);
+    if (previousValues.length >= (max - min + 1)) {
+      console.error(`Перебраны все числа из диапазона от ${ min } до ${ max}`);
+      return null;
+    }
+    while (previousValues.includes(currentValue)) {
+      currentValue = getRandomPositiveInteger(min, max);
+    }
+    previousValues.push(currentValue);
+    return currentValue;
+  };
+}
 
 function createComment () {
-  const commentId = getRandomPositiveInteger(1, 1000);
+  const commentId = getRandomIdFromRangeGenerator(1, 1000)();
   return {
     id: commentId,
     avatar: `img/avatar-${ getRandomPositiveInteger(1, 6) }.svg`,
@@ -78,9 +73,10 @@ function createComment () {
     name: getRandomArrayElement(NAMES),
   };
 }
+console.log(createComment())
 
 function createPublishedPhoto () {
-  const photoId = getRandomPositiveInteger(1, 25);
+  const photoId = getRandomIdFromRangeGenerator(1, 25)();
   return {
     id: photoId,
     url: getRandomPositiveInteger(1, 25),
@@ -90,5 +86,6 @@ function createPublishedPhoto () {
   };
 }
 
-const publishedPhotos = Array.from({length: 25}, createPublishedPhoto);
+const requiredPhotos = 25;
+const publishedPhotos = Array.from({length: requiredPhotos}, createPublishedPhoto);
 console.log(publishedPhotos);
